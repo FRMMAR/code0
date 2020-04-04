@@ -1,0 +1,18 @@
+<html>
+<head>
+</head>
+<body>
+
+<h1>this is movie page</h1>
+{% for i in model_list %}
+<li>
+<a href="movie/{{ i.id }}.html">{{ i.title }}
+<a>
+</li>
+{% endfor %}
+
+{% if up%}
+<a href="/page/list_{{ up }}.html" class="btn"> next page </a>
+{% endif %}
+</body>
+</html>
