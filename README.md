@@ -9,6 +9,7 @@ my daily used code
 ## [unittest_demo](https://github.com/FRMMAR/code0/blob/master/unittest_demo.py) the usage of unittest
 ## [xmlparser_demo](https://github.com/FRMMAR/code0/blob/master/xmlParser_demo.py) the usage of apply_async of multiprocessing.Pool
 ## [DjangoMovieSite_demo](https://github.com/FRMMAR/code0/blob/tree/master/movie) the usage of Django framework for a movie site
+## [rfm_demo](https://github.com/FRMMAR/code0/blob/tree/master/rfm_demo) a small ds project for rfm based on kmeans
 
 
 
