@@ -10,6 +10,10 @@ my daily used code
 ## [xmlparser_demo](https://github.com/FRMMAR/code0/blob/master/xmlParser_demo.py) the usage of apply_async of multiprocessing.Pool
 ## [DjangoMovieSite_demo](https://github.com/FRMMAR/code0/blob/tree/master/movie) the usage of Django framework for a movie site
 ## [rfm_demo](https://github.com/FRMMAR/code0/blob/tree/master/rfm_demo) a small ds project for rfm based on kmeans
-
-
+## [decorator_demo](https://github.com/FRMMAR/code0/blob/master/decorator_demo.py) the essentials of decorator
+## [delaunay_demo](https://github.com/FRMMAR/code0/blob/master/delaunay_demo.py) the usage of delaunay
+## [mlab_demo](https://github.com/FRMMAR/code0/blob/master/mlab_demo.py) the mlab for scientific calculation
+## [sysargv_demo](https://github.com/FRMMAR/code0/blob/master/decorator_demo.py) the usage of sysargv
+## [stlfile](https://github.com/FRMMAR/code0/blob/master/stlfile.py) the personal explore to stl
+## [misinsidepolygon](https://github.com/FRMMAR/code0/blob/master/decorator_demo.py) to be continued
 
