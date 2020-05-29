@@ -1,0 +1,970 @@
+# include <iostream>
+
+// 1.指针、引用、const、内存分配、内联函数、函数重载与参数默认值
+/*该节内容从引用的基本概念、基本用法，到常量引用、常量指针做了介绍，从传统的函数传参到由于有了引用而加入的传引用，并对引用作为函数的返回值这一特殊用法进行示例讲解。
+常引用、常量指针都不能通过其改变所引用的或指向的变量。
+用new实现动态内存分配，用delete释放动态分配的内存，改变指针指向为NULL。
+内联函数：减少函数调用的开销，直接将函数代码插入到调用语句处。
+函数重载：一个或多个函数，名字相同，然而参数个数或参数类型不相同，这叫做函数的重载。
+函数的缺省参数：C++中，定义函数的时候可以让最右边的连续若干个参数有缺省值，那么调用函数的时候，若相应位置不写参数，参数就是缺省值。
+C语言使用结构化程序设计：程序 = 算法 + 数据结构。缺点：没有封装和隐藏，程序较大时不易于维护和扩充。
+面向对象的程序设计方法：设计程序的过程，就是设计类的过程。
+客观世界——程序设计类的抽象过程，
+对象的内存分配：对象所占用内存空间的大小，等于所有成员变量的大小之和。
+对象间的运算：可以使用赋值号进行赋值，或者使用重载过的运算符。
+类的成员变量和成员函数的访问方法。
+
+*/
+
+// main()
+// {
+// 	int i = 5;
+// 	int const &a = 5 * i;
+// 	// int  &a = 5 * i; 
+// 	// 错误示范，临时变量的值不能改变，是const的，需要const的引用
+// 	// c++编译器加入了临时变量不能作为非const引用
+// 	// 应用：函数使用临时变量，需在定义时指明其参数为const类型，或者在使用时引入非临时变量
+// 	// const int &r = i;
+// 	// 常引用：不能通过该引用改变值
+// 	// const int *p = i;
+// 	// 常量指针:不能通过该指针改变值，但可以改变指针指向
+// 	std::cout << i << &i << std::endl;
+// 	std::cout << a << &a << std::endl;
+// 	std::cout << sizeof(i) << std::endl;
+// }
+
+// 用new运算符可实现内存的动态分配
+// p = new T；		//分配sizeof(T)的内存空间，并将该空间的起始地址分配给p
+// p = new T[n];	//分配sizeof(T[N])的内存空间，并将该空间的起始地址分配给p
+// 注意数组越界问题！！！
+// delete [] T;	//释放动态分配的数组；
+
+// 内联函数：函数调用产生的开销较大，内联函数可减少函数调用产生的开销；
+// 编译器处理内联函数的调用语句时，是将整个函数的代码插入到调用语句处，不会产生调用函数的语句。
+
+// 函数重载，通过不同的参数个数或类型实现同名函数的不同调用；
+
+// 函数的缺省参数：定义函数时可让最右边的连续若干个参数有缺省值。
+// 调用函数时，相应位置若无参数，则参数就为缺省值
+
+// 2.类与对象、构造函数、复制构造函数、类型转换构造函数、析构函数
+/*
+类成员的可访问范围：在类的定义中使用private（缺省参数）、protected、public这三个访问范围关键字进行限定。
+private设置私有成员的机制，叫做“隐藏”，目的：对成员变量的修改只能通过成员函数进行。
+使用struct关键字也可定义类，使用struct定义时，未说明共有还是私有，即是公有。
+类的成员函数也可以重载，也可以带缺省参数，但是使用带有缺省参数的函数重载时应注意二义性问题。
+构造函数：成员函数的一种，可以有参数，不能有返回值；作用是对对象进行初始化，如给成员变量赋初值；如果定义类时没写构造函数，那么编译器会生成一个默认的无参构造函数，默认构造函数无参数，不做任何操作；如果定义了构造函数，那么编译器不会生成默认的无参构造函数；对象生成时构造函数被自动调用，对象一旦生成，就再也不能在其上执行构造函数；一个类可以有多个构造函数。
+构造函数也可以重载，构造函数最好是public的，private构造函数不能直接用来初始化对象。
+用数组做参数调用构造函数生成对象数组。???
+复制构造函数：用一个对同类对象的引用作为参数；形式为X::X(X&)或X::X(const X&)；若未定义，编译器生成默认的复制构造函数，完成复制功能。
+复制构造函数起作用的三种情况：。
+使用常量引用参数防止函数调用时引发复制构造函数开销较大的问题。
+类型转换构造函数：实现类型的自动转换；另外一种构造函数；当需要的时候，编译系统会自动调用转换构造函数，建立一个无名的临时对象（或临时变量）；普通类型转换构造函数、显式类型转换构造函数。
+析构函数：名字与类名相同，前面加“~”，没有参数和返回值，一个类最多只能有一个析构函数；在对象消亡时自动被调用；若在定义类时没写析构函数，则编译器生成缺省析构函数，缺省析构函数什么也不做；如果定义了析构函数，则编译器不生成缺省析构函数。
+析构函数和数组
+析构函数在对象作为函数返回值返回后被调用
+构造函数和析构函数的调用顺序
+*/
+
+// 结构化程序 = 数据 + 算法
+// 规模较大的结构化程序，难以理解、难以扩充、难以查错、难以重用
+// 面向对象是为解决上述问题
+
+// 类：
+// 对象所占用的空间的大小，等于所有成员变量的大小之和（不包括成员函数）
+// 实例化成为对象/初始化成为对象的指针/使用对象的引用（别名，相当于修改原对象）
+
+// 类成员：默认是有的
+// 私有成员-隐藏-通过类的方法进行修改
+// 成员函数的overload，带缺省值的成员函数与不带参数的成员函数的二义性问题
+
+// 构造函数
+// 名字与类名一致，可以有参数，不能有返回值（void也不行）
+// 对象已经占用了存储空间，构造函数对其进行初始化
+// 没有构造函数，编译器默认生成没有参数的构造函数
+// 重载的构造函数：不同的参数个数或类型
+
+// ！！！构造函数在数组中的使用：用构造函数初始化数组元素
+// Class array1[2];	调用无参的Class类的构造函数，生成的两个对象构成数组；
+// Class array2[2] = {1}；调用1个参数为1的Class类的构造函数，调用无参的Class类的构造函数，生成的两个对象构成数组；
+// Class *array3 = new Class[2]; 调用无参的Class类的构造函数，array3指向这两个参数构成的数组的首地址；
+
+// Test array4[3] = { 1, Test(1,2) }; 	分别使用1个参数1、两个参数1和2、无参数构造Test对象，这些对象组成array4[3]
+
+// ！！！ 复制构造函数：起作用的三种情况
+// 1.当用一个对象去初始化同类的另一个对象时
+// Class c2 = c1;
+// Class c2(c1);
+
+// class Complex 
+// {
+// 	public :
+// 	double real,imag;
+// 	Complex()
+// 	{
+// 		std::cout << "Constructor called. \n";		
+// 	}
+// 	Complex(const Complex& c )
+// 	{
+// 		real = c.real;
+// 		imag = c.imag;
+// 		std::cout << "Copy Constructor called";
+// 	}
+// };
+
+// main()
+// {
+// 	Complex c1;
+// 	Complex c2(c1); 
+// }
+
+// 2.如果函数有一个参数是类A的对象，那么该函数被调用时，类A的复制构造函数将被调用
+// class A
+// {
+// 	public:
+// 		A() { };
+// 		A( A & a) 
+// 		{
+// 			std::cout << "Copy constructor called" <<std::endl;
+// 		}
+// };
+
+// void Func(A a1)
+// {
+
+// }
+// int main()
+// {
+// 	A a2;		//声明，未构造
+// 	std::cout << "HIII"<< std::endl;
+// 	Func(a2);	//调用函数时，构造类A的对象a2，调用其构造函数
+// 	return 0;
+// }
+
+// 3.如果函数的返回值是类A的对象时，则函数返回时，A的复制构造函数被调用。
+// class A		//sublime下使用g++编译无法得到预期结果，使用VS可以
+// {			//出于优化目的并未生成返回值临时对象 
+// 	public:
+// 		int v;
+// 		A(int n) { v = n; };
+// 		A( const A & a) 
+// 		{
+// 			v = a.v;
+// 			std::cout << "Copy constructor called" << std::endl;
+// 		}
+// };
+
+// A Func() 
+// {
+// 	A b(4);
+// 	std::cout << "before return" << std::endl;
+// 	return b;
+// }
+
+// int main() 
+// {
+// 	std::cout << Func().v << std::endl; 
+// 	return 0;
+// }
+
+// 类型转换构造函数
+// 实现类型的自动转换，赋值号右侧构造相对应类的临时实例
+
+// using namespace std;
+// class Complex 
+// {
+// public:
+// 	double real, imag;
+// 	// Complex( int i) 			//类型转换构造函数，可将i转换为Complex
+// 	explicit Complex( int i) //显式类型转换构造函数，只能显示调用构造函数
+// 	{//类型转换构造函数
+// 		cout << "IntConstructor called" << endl;
+// 		real = i; imag = 0;
+// 	}
+// 	Complex(double r,double i) 
+// 	{real = r; imag = i; }
+// };
+
+// int main ()
+// {
+// 	Complex c1(7,8);
+// 	cout << "c1 ok\n";
+// 	// Complex c2 = 12;
+// 	Complex c2 = Complex(12);	//需显示调用Complex方法，，不能向上行语句一样
+// 	cout << "c2 ok\n" << c2.real << "," << c2.imag << endl;
+// 	c1 = Complex(15);
+// 	// c1 = 9; // 9被自动转换成一个临时Complex对象，该临时对象构造时调用类型转换构造函数
+// 	cout << c1.real << "," << c1.imag << endl;
+// 	return 0;
+// }
+
+
+// 构造函数和析构函数的调用时间：花括号的边界-作用域
+// 不同编译器对构造函数的处理方式不同
+
+// using namespace std;
+// class A 
+// {
+// 	public:
+// 		int x;
+// 		A(int x_):x(x_)		//这个构造函数定义，使用x_初始化x
+// 		{ cout << x << " constructor called" << endl; }
+// 		A(const A & a ) 
+// 		{ //本例中dev需要此const其他编译器不要
+// 			x = 2 + a.x;
+// 			cout << "copy called" << endl;
+// 		}
+// 		~A() { cout << x << " destructor called" << endl; }
+// 	};
+
+// A f( )
+// { 
+// 	A b(10);  	//调用参数为10的类A的构造函数，构造对象b
+// 	return b; 	//返回A类型的B
+// }
+// int main( )
+// {
+// 	A a(1);		//调用参数为1的类A的构造函数，构造对象a
+// 	a = f();	//将f()的返回值赋值给a
+// 	return 0;
+// }
+
+// 3. 类中的 this 、 static、 const、 mutable、 friend、 成员对象和封闭类的构造与析构
+// this 指针：指向成员函数指向的对象
+
+// C++到C代码的翻译
+
+// 静态成员：静态成员变量与静态成员函数
+
+// 封闭类enclosing：有成员对象的类
+// 通过封闭类的构造函数的初始化列表构造类的对象的初始化
+// 消亡时，先执行封闭类的析构，然后执行成员对象的析构
+
+// 封闭类的复制构造函数：与复制构造函数有何区别
+
+// 友元类的关系不能传递，不能继承
+
+// 对象初始化时前面加const即声明为常量对象，常量对象只能使用构造函数、析构函数、和有const说明的函数
+
+// 在类的成员函数说明后面加上const关键字，则该成员函数成为常量成员函数
+// 常量成员函数内部不能改变属性的值，也不能调用非常量成员函数
+// 常量对象上可以使用常量成员函数
+// 声明和定义时都应使用const关键字
+// void Sample::PrintValue() const {}；
+// 建议：如果一个成员函数中没有调用非常量成员函数，也没有修改成员变量的值，那么，最好将其写成常量成员函数
+
+// 两个函数，一个有 const，一个没有 const，算重载
+
+// mutable 修饰符，可以在 const 成员函数中修改的成员变量
+
+// 4.运算符重载： 普通运算符重载&类成员运算符重载、流插入运算符、流提取运算符、类型转换运算符、自增自减运算符、运算符重载为友元
+// 运算符重载的实质是函数重载
+//  可以重载为普通函数，也可以重载为成员函数
+//  把含运算符的表达式转换成对运算符函数的调用。
+//  把运算符的操作数转换成运算符函数的参数。
+//  运算符被多次重载时，根据实参的类型决定调用哪个运算符函数。
+
+// 赋值运算符“=”只能重载为成员函数----why？？
+
+// #include <cstring>
+// using namespace std;
+// class String 
+// {
+// 	private:
+// 		char * str;
+// 	public:
+// 		String ():str(new char[1]) { str[0] = 0;}
+// 		const char * c_str() { return str; };
+// 		String & operator = (const char * s);
+// 		~String( ) { delete [] str; }
+// };
+
+// String & String::operator = (const char * s) 
+// { //重载“=”以使得 obj = “hello”能够成立
+// 	delete [] str;
+// 	str = new char[strlen(s)+1];
+// 	strcpy( str, s);
+// 	return * this;
+// }
+
+// int main()
+// {
+// 	String s;
+// 	s = "Good Luck," ; //等价于 s.operator=("Good Luck,");
+// 	cout << s.c_str() << endl;
+// 	// String s2 = "hello!"; //这条语句要是不注释掉就会出错
+// 	s = "Shenzhou 8!"; //等价于 s.operator=("Shenzhou 8!");
+// 	cout << s.c_str() << endl;
+// 	return 0;
+// }
+
+
+// class String 
+// {
+// 	private: 
+// 		char * str;
+// 	public:
+// 		String():str(new char[1]) { str[0] = 0; }
+// 		const char * c_str() { return str; };
+
+// 		String & operator = (const String & s)
+// 		{
+// 			if( this == & s) 
+// 				return * this;
+// 			delete [] str;
+// 			str = new char[strlen(s.str)+1];
+// 			strcpy( str,s.str);
+// 			return * this;
+// 		}
+// 		~String( ) { delete [] str; }	//浅拷贝和深拷贝，内存泄漏的问题
+// };
+
+// 运算符重载为友元函数
+// 一般重载为成员函数。但有时，重载为成员函数不能满足使用要求，重载为普通函数，又不能访问类的私有成员，所以需要将运算符重载为友元。
+
+// 可变长数组示例
+
+// 流插入运算符和流提取运算符的重载
+
+// 类型转换运算符和自增、自减运算符的重载
+
+// 5.继承和派生
+
+// 派生类对象的内存空间 = 基类对象的成员变量的空间 + 派生类新增成员变量的内存空间
+
+// 复合关系的写法
+// class CMaster; 
+// class CDog 
+// {
+// 	CMaster * pm;
+// };
+// class CMaster 
+// {
+// 	CDog * dogs[10];
+// };
+
+
+// • 基类的private成员：可以被下列函数访问
+// – 基类的成员函数
+// – 基类的友元函数
+
+// • 基类的protected成员：可以被下列函数访问
+// – 基类的成员函数
+// – 基类的友元函数
+// – 派生类的成员函数可以访问当前对象的基类的保护成员
+
+// • 基类的public成员：可以被下列函数访问
+// – 基类的成员函数
+// – 基类的友元函数
+// – 派生类的成员函数
+// – 派生类的友元函数
+// – 其他的函数
+
+// 覆盖：派生类定义一个和基类成员同名的成员，访问时访问到派生类的成员，若需访问基类成员需使用作用域符号：：
+// 创建派生类的对象：调用基类的构造函数-调用成员对象类的构造函数-构造派生类的构造函数-调用派生类的析构函数-调用成员对象类的析构函数-调用基类的析构函数
+
+// public继承的赋值兼容规则
+// 1） 派生类的对象可以赋值给基类对象
+// b = d;
+// 2） 派生类对象可以初始化基类引用
+// base & br = d;
+// 3） 派生类对象的地址可以赋值给基类指针
+// base * pb = & d; //---------虚函数前提
+// 如果派生方式是 private或protected，则上述三条不可行。！！！
+
+// • protected继承时，基类的public成员和protected成员成为派生类的protected成员。
+// • private继承时，基类的public成员成为派生类的private成员，基类的protected成员成为派生类的不可访问成员。
+// • protected和private继承不是“是”的关系。
+
+// Base * ptrBase = &objDerived;
+// ptrBase指向的是一个Derived类的对象；
+// *ptrBase可以看作一个Base类的对象，访问它的public成员直接通过ptrBase即可，但不能通过ptrBase访问objDerived对象中属于Derived类而不属于Base类的成员
+// 通过强制指针类型转换，可以把ptrBase转换成Derived类的指针
+// Derived *ptrDerived = (Derived * ) ptrBase;
+// 要保证ptrBase指向的是一个Derived类的对象，否则很容易会出错
+// 父类指针指向子类对象---本质：公有继承的赋值兼容规则的拓展
+
+// 直接基类与间接基类
+
+
+// 6.虚函数、多态、实现原理、虚析构函数、纯虚函数、抽象类
+
+// 虚函数，virtual 关键字只用在类定义的函数声明中，写函数体时不用。
+
+// 多态：（pulic继承的赋值兼容规则3的前提下）
+// 表现形式一：
+// 派生类的指针可以赋给基类指针。通过基类指针调用基类和派生类中的同名虚函数时:
+// （1）若该指针指向一个基类的对象，那么被调用是基类的虚函数；
+// （2）若该指针指向一个派生类的对象，那么被调用的是派生类的虚函数。
+// 这种机制就叫做“多态”
+
+// class CBase 
+// 	{ 
+// 	public:
+// 		virtual void SomeVirtualFunction() 
+// 		{
+// 			std::cout << "BASE"  <<std::endl;
+
+// 		} 
+// 	};
+
+// class CDerived:public CBase 
+// 	{
+// 	public :
+// 	virtual void SomeVirtualFunction() 
+// 	{
+// 			std::cout << "dep"  <<std::endl;
+
+// 	}
+// 	};
+
+// int main()
+// {
+// 	CDerived ODerived;
+// 	CBase * p = & ODerived;		//调用哪个虚函数取决于p指向哪种类型的对象,而不是是什么类型的指针
+// 	p -> SomeVirtualFunction();  //调用dep的对象
+// 	return 0;
+// }
+
+// 多态表现形式二：
+// 派生类的对象可以赋给基类引用，通过基类引用调用基类和派生类中的同名虚函数时:
+// （1）若该引用引用的是一个基类的对象，那么被调用是基类的虚函数；
+// （2）若该引用引用的是一个派生类的对象，那么被调用的是派生类的虚函数。
+// 这种机制也叫做“多态”。
+
+// class CBase 
+// {
+// 	public:
+// 		virtual void SomeVirtualFunction() 
+// 		{
+// 		std::cout << "BASE"  <<std::endl;
+// 		} 
+// };
+
+// class CDerived:public CBase 
+// {
+// 	public :
+// 	virtual void SomeVirtualFunction() 
+// 	{std::cout << "dep"  <<std::endl;}
+// };
+
+// int main() 
+// {
+// 	CDerived ODerived;
+// 	CBase & r = ODerived;
+// 	r.SomeVirtualFunction();  //调用哪个虚函数取决于r引用哪种类型的对象
+// 	return 0;
+// }
+
+// 在面向对象的程序设计中使用多态，
+// 能够增强程序的可扩充性，即程序需要修改或增加功能的时候，需要改动和增加的代码较少。
+
+// 在构造函数和析构函数中调用虚函数，不是多态。
+// 编译时即可确定，调用的函数是自己的类或基类中定义的函数，不会等到运行时才决定调用自己的还是派生类的函数。
+
+// 下例说明子类的构造与析构顺序以及虚函数多态的实现
+// using namespace std;
+// class myclass 
+// {
+// 	public:
+// 		virtual void hello(){cout<<"hello from myclass"<<endl;}
+// 		virtual void bye(){cout<<"bye from myclass"<<endl;}
+// };
+
+// class son:public myclass
+// { 
+// 	public:
+// 		void hello(){ cout<<"hello from son"<<endl;};  //派生类中和基类中虚函数同名同参数表的函数，不加virtual也自动成为虚函数
+// 		son(){ hello(); };
+// 		~son(){ bye(); };
+// }; 
+
+// class grandson:public son
+// { 
+// 	public:
+// 		void hello(){cout<<"hello from grandson"<<endl;};
+// 		void bye() { cout << "bye from grandson"<<endl;}
+// 		grandson(){cout<<"constructing grandson"<<endl;};
+// 		~grandson(){cout<<"destructing grandson"<<endl;};
+// };
+
+// int main()
+// {
+// 	grandson gson;
+// 	son *pson;
+// 	pson=&gson; 
+// 	pson->hello(); //多态
+// 	return 0;
+// }
+
+// 虚函数的访问权限
+// using namespace std;
+// class Base {
+// public:			//该处若为private或protected会导致编译出错
+// virtual void fun2() { cout << "Base::fun2()" << endl; }
+// };
+// class Derived:public Base {
+// private: 
+// virtual void fun2() { cout << "Derived:fun2()" << endl; }
+// };
+
+// int main()
+// {
+// 	Derived d;
+// 	Base * pBase = & d;
+// 	pBase -> fun2();  // 
+// }
+
+//  编译出错是因为 fun2() 是Base的私有成员。即使运行到此时实际上调用的应该是Derived的公有成员 fun2()也不行，因为语法检查是不考虑运行结果的。
+//  如果 将Base中的 private换成public,即使Derived中的fun2() 是private的，编译依然能通过，也能正确调用Derived::fun2()。
+
+// “多态”的关键在于通过基类指针或引用调用一个虚函数时，编译时不确定到底调用的是基类还是派生类的函数，运行时才确定 ---- 
+// 这叫“动态联编”。
+
+// using namespace std;
+// class Base {
+// public:
+// int i;
+// virtual void Print() { cout << "Base:Print" ; }
+// };
+// class Derived : public Base{
+// public:
+// int n;
+// virtual void Print() {  cout <<"Drived:Print" << endl; }
+// };
+// int main() {
+// Derived d;
+// cout << sizeof( Base) << ","<< sizeof( Derived ) ;  //8,12
+// return 0;
+// } 
+
+多态的函数调用语句被编译成一系列根据基类指针所指向的（或基类引用所引用的）对象中存放的虚函数表的地址，在虚函数表中查找虚函数地址，并调用虚函数的指令。
+
+
+malloc
+
+#include <malloc.h>
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <stdio.h>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+
+
+using namespace std;
+ 
+// int main(){
+	
+// 	int * array;     //声明指针
+// 	array = (int*)malloc(5 * sizeof(int));    //申请内存,将void强制类型转化
+	
+// 	for(int i= 0;i<5;i++){
+// 		array[i]=i;      //赋值
+// 	}
+
+// 	cout << array[3] <<endl;
+	
+// 	free(array);    //释放内存，将该段内存标记为可用，仍可被自由调用或malloc申请
+//     array = NULL; //防止指针数据冲突		
+// 	return 0;
+// }
+
+// cin.getline(a, 5)	//获取4个字符到a，第五个是/0
+// getline(cin, str)	//获取cin到str，需包含<string>
+
+// ifstream fin("test.txt"/*, ios::binary*/);  
+// if (fin.peek() == EOF)  	//判断文件是否为空文件
+
+
+// int main()
+// {
+//     int  *  array1;    //未初始化的指针
+// 	*array1 =  5 ;  		//常见正确方式*array1 = &a; 但像前面这么也不报错
+// 	cout << *array1 << array1 << endl;   //没有输出，没有报错，但其实是错误的？
+// }
+
+// main ()
+// {
+// char m[3][20];  //三个长度为20的数组
+// for(int i=0;i<3;i++)
+// {
+// cout<<"\nPlesse Enter "<<i+1<<"th stringg: "<<endl;
+// cin.getline(m[i],20);
+// }
+// for(int j=0;j<4;j++)
+// cout<<"the value of m["<<j<<"] is: "<<m[j]<<endl;
+// }
+ 
+// int main()
+// {
+//     string word;
+//     char c;
+//     int n;
+//     cout << "Please enter a word or a number: ";
+//     c = cin.peek();	//读取并返回下一个字符，但并不提取该字符到输入流中
+//     if(isdigit(c))	//判断是否十进制字符
+//     {
+//         cin >> n;
+//         cout << "You have entered a number: " << n << endl;
+//     }
+//     else
+//     {
+//         cin >> word;
+//         cout << "You have entered a word: " << word << endl;
+//     }
+//     return 0;
+// }
+
+
+
+// int main() 
+// {
+// 	int x;
+// 	char buf[100];
+// 	cin >> x;		//先读取内容到x
+// 	cin.getline(buf,90);	//若为回车，getline读到空，只有/0；；若为空格，buf为空格加后续的
+// 	cout << buf << endl;
+// 	return 0;
+// }
+
+// 流操纵算子
+// dec 
+// oct 
+// hex
+// setbase
+// precision 		// 成员函数 cout.precision(5)
+// setprecision	// 流操作算子 cout << setprecision(5)
+// setw	//	域宽，流操作算子
+// width	//成员函数
+
+// setiosflags(ios::fixed)	//以小数点位置固定的方式输出
+// resetiosflags(ios::fixed)	//重置至非定点
+
+// 指定输出浮点数的有效位数（非定点方式输出时）
+// 指定输出浮点数的小数点后的有效位数（定点方式输出时） 小数点必须出现在个位数后面
+
+// #include <iomanip>
+
+// main()
+// {
+// 	int w = 4;
+// 	char string[10];
+// 	cin.width(5);
+// 	while(cin >> string)
+// 		{
+// 			cout.width(w++);
+// 			cout << string << endl;
+// 			cin.width(5);
+// 		}
+
+// }
+
+// int main() {
+// int n = 141;
+// //1) 分别以十六进制、十进制、八进制先后输出 n
+// cout << "1) " << hex << n << " " << dec << n << " " << oct << n << endl;
+// double x = 1234567.89,y = 12.34567;
+// //2) 保留5位有效数字
+// cout << "2) " << setprecision(5) << x << " " << y << " " << endl;
+// //3) 保留小数点后面5位
+// cout << "3) " << fixed << setprecision(5) << x << " " << y << endl ;
+// //4) 科学计数法输出，且保留小数点后面5位
+// cout << "4) " << scientific << setprecision(5) <<x << " " << y << endl ;
+// //5) 非负数要显示正号，输出宽度为12字符，宽度不足则用'*'填补
+// cout << "5) " << showpos << fixed << setw(12) << setfill('*') << 12.1 << endl;
+// //6) 非负数不显示正号，输出宽度为12字符，宽度不足则右边用填充字符填充
+// cout << "6) " << noshowpos << setw(12) << left << 12.1 << endl;
+// //7) 输出宽度为12字符，宽度不足则左边用填充字符填充
+// cout << "7) " << setw(12) << right << 12.1 << endl;
+// //8) 宽度不足时，负号和数值分列左右，中间用填充字符填充
+// cout << "8) " << setw(12) << internal << -12.1 << endl;
+// cout << "9) " << 12.1 << endl;
+// return 0;
+// }
+
+
+// ostream &tab(ostream &output)	//// 用户自定义流操纵算子，返回值和参数值有且只有ostream引用
+// {
+// return output << '\t';
+// }
+// main()
+// {
+// 	cout << "aa" << tab << "bb" << endl;	//tab是函数
+// 	return 0;
+// }
+
+// 解释：函数指针、运算符重载
+// ostream & operator <<( ostream & ( * p ) ( ostream & ) ) ;
+// ostream类 里对 左移运算符 进行了重载，该函数内部会调用p所指向的函数，且以*this作为参数
+
+// 该函数内部会调用p所指向的函数，且以 *this 作为参数
+// p与tab类型匹配
+// hex 、dec 、oct 都是函数
+
+//  对于输入文件,有一个读指针;
+//  对于输出文件,有一个写指针;
+//  对于输入输出文件,有一个读写指针;
+//  标识文件操作的当前位置, 该指针在哪里,读写操作就在哪里进行。
+
+// 文件的写指针
+// ofstream fout("a1.out",ios::app); //以添加方式打开
+// long location = fout.tellp(); //取得写指针的位置
+// location = 10;
+// fout.seekp(location); // 将写指针移动到第10个字节处
+// fout.seekp(location,ios::beg); //从头数location
+// fout.seekp(location,ios::cur); //从当前位置数location
+// fout.seekp(location,ios::end); //从尾部数location
+// • location 可以为负值
+
+// 文件的读指针
+// ifstream fin(“a1.in”,ios::ate);//打开文件，定位文件指针到文件尾
+// long location = fin.tellg(); //取得读指针的位置
+// location = 10L;
+// fin.seekg(location); // 将读指针移动到第10个字节处
+// fin.seekg(location,ios::beg); //从头数location
+// fin.seekg(location,ios::cur); //从当前位置数location
+// fin.seekg(location,ios::end); //从尾部数location
+// • location 可以为负值
+
+
+// int main() 
+// {
+// 	vector<int> v;
+// 	ifstream srcFile("in.txt",ios::in);
+// 	ofstream destFile("out.txt",ios::out);
+// 	int x;
+// 	while( srcFile >> x )
+// 		v.push_back(x);
+// 	sort(v.begin(),v.end());
+// 	for( int i = 0;i < v.size();i ++ )
+// 		destFile << v[i] << " ";
+// 	destFile.close();	//显示关闭文件
+// 	srcFile.close();
+// 	return 0;
+// }
+
+// #include <iostream>
+// #include <fstream>
+// using namespace std;
+// int main() {
+// ofstream fout("some.dat", ios::out | ios::binary);
+// int x=120;
+// fout.write( (const char *)(&x), sizeof(int) );
+// fout.close();
+// ifstream fin("some.dat",ios::in | ios::binary);
+// int y;
+// fin.read((char * ) & y,sizeof(int));
+// fin.close();
+// cout << y <<endl;
+// return 0;
+// }
+写文件
+#include <iostream>
+#include <fstream>
+using namespace std;
+struct Student {
+char name[20];
+int score;
+};
+int main() {
+Student s;
+ofstream OutFile( "c:\\tmp\\students.dat",ios::out|ios::binary);
+while( cin >> s.name >> s.score )
+OutFile.write( (char * ) & s, sizeof( s) );
+OutFile.close();
+return 0;
+}
+
+读文件
+#include <iostream>
+#include <fstream>
+using namespace std;
+struct Student {
+char name[20];
+int score;
+};
+
+int main() {
+Student s;
+ifstream inFile("students.dat",ios::in | ios::binary );
+if(!inFile) {
+cout << "error" <<endl;
+return 0;
+}
+while( inFile.read( (char* ) & s, sizeof(s) ) ) {
+int readedBytes = inFile.gcount(); //看刚才读了多少字节
+cout << s.name << " " << s.score << endl;
+}
+inFile.close();
+return 0;
+}
+
+
+读写
+#include <iostream>
+#include <fstream>
+using namespace std;
+struct Student {
+char name[20];
+int score;
+};
+
+int main()
+{
+Student s;
+fstream iofile( "c:\\tmp\\students.dat",
+ios::in|ios::out|ios::binary);
+if( !iofile) {
+cout << "error" ;
+return 0;
+}
+iofile.seekp( 2 * sizeof(s),ios::beg); //定位写指针到第三个记录
+iofile.write("Mike",strlen("Mike")+1);
+iofile.seekg(0,ios::beg); //定位读指针到开头
+while( iofile.read( (char* ) & s, sizeof(s)) )
+cout << s.name << " " << s.score << endl;
+iofile.close();
+return 0;
+}
+
+z
+#include <string>
+#include <iostream>
+#include <sstream>
+
+// #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+#include <functional>
+using namespace std;
+
+// 8. STL string、vector、deque、list、函数对象
+
+// s.c_str() //转换成C语言的const char *类型，且以\0结尾
+// s的成员函数data()，返回char*
+
+// 字符串流处理
+// • 除了标准流和文件流输入输出外，还可以从string进行输入输出；
+// • 类似 istream和osteram进行标准流输入输出，我们用istringstream 和 ostringstream进行字符串上的输入输出，也称为内存输入输出。
+
+// 字符串流处理 - 字符串输入流 istringstream
+
+// string input("Input test 123 4.7 A");
+// istringstream inputString(input);
+// string string1, string2;
+// int i;
+// double d;
+// char c;
+// inputString >> string1 >> string2 >> i >> d >> c;
+// cout << string1 << endl << string2 << endl;
+// cout << i << endl << d << endl << c <<endl;
+// long L;
+// if(inputString >> L) cout << "long\n";
+// else cout << "empty\n";
+
+
+// istringstream 当作cin来用
+// ostringstream 当作cout来用
+
+// 泛型程序设计(generic programming) 的思想： 模板机制，以及标准模板库 STL
+
+// STL就是一些常用的数据结构和算法的模板的集合
+
+// 容器：可容纳各种数据类型的通用数据结构,是类模板
+// 迭代器：可用于依次存取容器中元素，类似于指针
+// 算法：用来操作容器中的元素的函数模板
+//  sort()来对一个vector中的数据进行排序
+//  find()来搜索一个list中的对象
+// 算法本身与他们操作的数据的类型无关，因此他们可以在从简单数组到高度复杂容器的任何数据结构上使用。
+
+// 放入容器的对象所属的类，一般需重载<和==运算符
+
+// 1)顺序容器vector, deque,list
+// 2)关联容器set, multiset, map, multimap
+// 3)容器适配器stack, queue, priority_queue
+
+// 基本容器的操作复杂度
+// vector
+
+// deque
+
+// list
+// 双向链表。元素在内存不连续存放。在任何位置增删元素都能在常数时间完成。不支持随机存取。
+// 无【】方法，双向迭代器，非随机访问迭代器
+
+// 关联容器简介
+//  元素是排序的
+//  插入任何元素，都按相应的排序规则来确定其位置
+//  在查找时具有非常好的性能
+//  通常以平衡二叉树方式实现，插入和检索的时间都是 O(log(N))
+//  set/multiset 头文件 <set>
+// set 即集合。set中不允许相同元素，multiset中允许存在相同的元素。
+//  map/multimap 头文件 <map>
+// map与set的不同在于map中存放的元素有且仅有两个成员变量，一个名为first,另一个名为second, map根据first值对元素进行从小到大排序，并可快速地根据first来检索元素。
+// map同multimap的不同在于是否允许相同first值的元素。
+
+// 容器适配器
+// stack
+// queue
+// priority_queue
+
+
+// 双向迭代器，随机访问迭代器
+
+// 有序区间算法   bianry-search
+// 排序算法    sort
+// 左开右闭[)
+
+// 函数对象：若一个类重载了括号运算符“（）”，则该类的对象就成为了函数对象
+
+
+// 函数对象，模板函数，容器，算法
+// int sumSquares( int total, int value)
+// { return total + value * value; }
+// template <class T>
+// void PrintInterval(T first, T last)
+// { //输出区间[first,last)中的元素
+// for( ; first != last; ++ first)
+// cout << *first << " ";
+// cout << endl;
+// }
+
+// template<class T> 
+// class SumPowers
+// {
+// private:
+// int power; 
+// public:
+// SumPowers(int p):power(p) { }
+// const T operator() ( const T & total, 
+// const T & value) 
+// { //计算 value的power次方，加到total上
+// T v = value;
+// for( int i = 0;i < power - 1; ++ i)
+// 	v = v * value; 
+// return total + v; 
+// }
+// };
+
+// int main() 
+// {
+// const int SIZE = 10;
+// int a1[] = { 1,2,3,4,5,6,7,8,9,10 };
+// vector<int> v(a1,a1+SIZE);
+// cout << "1) "; PrintInterval(v.begin(),v.end());
+// int result = accumulate(v.begin(),v.end(),0,sumSquares);
+// cout << "2) square: " << result << endl;
+// result = 
+// accumulate(v.begin(),v.end(),0,SumPowers<int>(3)); 
+// cout << "3) 3power: " << result << endl;
+// result = 
+// accumulate(v.begin(),v.end(),0,SumPowers<int>(4)); 
+// cout << "4) 4power: " << result;
+// return 0;
+// }
+
+
